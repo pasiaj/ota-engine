@@ -102,6 +102,23 @@ curl localhost:8080/ota/api/day/12 | jq '.module_runs[0].think'
 curl -XPOST -H 'X-OTA-Admin: secret' -d '{"days":3}' -H 'content-type: application/json' localhost:8080/ota/api/run
 ```
 
+## Viewer
+
+`viewer/` is a static, build-free web viewer (vanilla ES modules + SVG) built strictly against
+`docs/DATA.md`. It works for any company on the engine. Views (hash-routed, every view/day/module/
+decision linkable, e.g. `#/module/ua/day/120`): **Start here** (onboarding, animated daily tick,
+guided tour, what is simulated vs real), **Docs** (module format, decision tables, LLM tiers,
+every toolkit component, Sentinel signatures, data model), **Birdseye** (org graph, day scrubber,
+KPI sparklines, event/Sentinel markers), **Module focus**, **Decision / Ledger**, **Health**,
+**People** and **Run** (admin token, human input).
+
+* API base: `../api/` relative to the page (so `/ota/sim/` → `/ota/api/`); override with
+  `?api=http://localhost:8080/ota/api/`.
+* Serve locally with the server: `OTA_VIEWER_DIR=$PWD/viewer cargo run -p ota-example-tiny -- serve /tmp/tiny-data`
+  and open `http://localhost:8080/ota/sim/`.
+* Publish: `tools/publish.sh /path/to/xpost` copies it to `nginx/www/pasiaj.com/ota/sim/`.
+* Visual identity (`assets/ota.css`, `assets/identity.js`) is copied from the OTA atlas.
+
 ## Checks
 
 ```sh
