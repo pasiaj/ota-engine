@@ -723,6 +723,8 @@ pub struct DayRecord {
     pub signals: Vec<Signal>,
     pub kpis: BTreeMap<String, f64>,
     pub deviations: Vec<Deviation>,
+    /// Earlier deviations whose queued alert was explicitly dismissed or acted on today.
+    pub deviation_updates: Vec<Deviation>,
     pub anomalies: Vec<Anomaly>,
     pub assumption_updates: Vec<AssumptionUpdate>,
     pub module_runs: Vec<ModuleRun>,

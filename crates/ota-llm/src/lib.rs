@@ -107,6 +107,8 @@ pub struct LlmClient {
     calls: Vec<LlmCallRecord>,
     /// Override the sleep in tests.
     pub backoff_ms: u64,
+    /// Use the scripted responder even when a live provider exists (history days).
+    pub force_scripted: bool,
 }
 
 impl LlmClient {
@@ -119,7 +121,7 @@ impl LlmClient {
             LlmMode::Live | LlmMode::Auto if key_present => Some(Box::new(OpenAiProvider::new())),
             _ => None,
         };
-        LlmClient { config, scripted, live, cache_dir, day: 0, spent_today: 0.0, spent_total: 0.0, calls: vec![], backoff_ms: 500 }
+        LlmClient { config, scripted, live, cache_dir, day: 0, spent_today: 0.0, spent_total: 0.0, calls: vec![], backoff_ms: 500, force_scripted: false }
     }
 
     /// Use a custom live provider (tests, other APIs).
@@ -129,7 +131,7 @@ impl LlmClient {
     }
 
     pub fn is_live(&self) -> bool {
-        self.live.is_some()
+        self.live.is_some() && !self.force_scripted
     }
 
     pub fn mode_label(&self) -> &'static str {
@@ -200,7 +202,7 @@ impl LlmClient {
     /// Make a call, honouring budget, cache and retries.
     pub fn call(&mut self, req: &LlmRequest) -> LlmResult {
         let base = LlmCallRecord { tier: req.tier.clone(), requested_tier: req.tier.clone(), purpose: req.purpose.clone(), ..Default::default() };
-        if self.live.is_none() {
+        if !self.is_live() {
             let r = self.scripted_result(req, base);
             self.calls.push(r.record.clone());
             return r;

@@ -112,10 +112,12 @@ impl Sentinel {
         // ---------------- AI failure modes
         add(FindingKind::FailureMode(AiFailureMode::Bypass), {
             let untraced = h.sum(d.saturating_sub(13), d, |a| a.untraced_human_actions);
-            let ignored = h.devs.iter().filter(|t| t.routed && t.day + 14 >= d && t.day + 3 <= d && t.acted_day.is_none() && t.dismissed_day.is_none()).count();
-            (untraced > 0 || ignored >= 5).then(|| (
-                format!("{untraced} human action(s) outside the ledger; {ignored} routed flags neither acted on nor dismissed"),
-                stats(&[("untraced", untraced as f64), ("ignored_flags", ignored as f64)]), vec![], Severity::Medium))
+            let routed: Vec<&crate::history::DevTrack> = h.devs.iter().filter(|t| t.routed && t.day + 14 >= d && t.day + 2 <= d).collect();
+            let unheeded = routed.iter().filter(|t| t.acted_day.is_none()).count();
+            let share = if routed.is_empty() { 0.0 } else { unheeded as f64 / routed.len() as f64 };
+            (untraced > 0 || (routed.len() >= 10 && share > 0.8)).then(|| (
+                format!("{untraced} human action(s) outside the ledger; {unheeded}/{} routed flags never acted on (14 d)", routed.len()),
+                stats(&[("untraced", untraced as f64), ("unheeded_share", share)]), vec![], Severity::Medium))
         });
         add(FindingKind::FailureMode(AiFailureMode::Abdication), {
             let hs = h.sum(r0, r1, |a| a.high_stakes_approvals);

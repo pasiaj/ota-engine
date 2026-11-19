@@ -3,6 +3,7 @@
 - impact: local
 - kind: routine
 - stakes_eur: 0
+- assumptions: [A-retention]
 - forecast: "DAU stays within 2 sigma tomorrow"
 - forecast_if: "abs(z(dau)) < 2"
 - forecast_horizon_days: 1

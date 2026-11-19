@@ -42,11 +42,11 @@ impl Autonomy {
     }
 
     /// Is a scheduled review due for this class today?
-    pub fn review_due(&self, c: &DecisionClass, day: Day) -> Option<&'static str> {
-        let last = self.last_review.get(&c.id).copied().unwrap_or(0);
+    /// `month_start` / `quarter_start` come from the calendar of the simulation.
+    pub fn review_due(&self, c: &DecisionClass, month_start: bool, quarter_start: bool) -> Option<&'static str> {
         match c.path {
-            DecisionPath::Path2 if day >= last + 30 && day % 30 == 1 => Some("monthly_review"),
-            DecisionPath::Path1 if day >= last + 91 && day % 91 == 1 => Some("quarterly_review"),
+            DecisionPath::Path2 if month_start => Some("monthly_review"),
+            DecisionPath::Path1 if quarter_start => Some("quarterly_review"),
             _ => None,
         }
     }
@@ -63,9 +63,8 @@ impl Autonomy {
             || ev.agreement_rate.map(|a| a < DEMOTE_AGREEMENT).unwrap_or(false));
         let good = ev.n >= MIN_N && ev.brier.map(|b| b <= PROMOTE_BRIER).unwrap_or(false)
             && ev.agreement_rate.map(|a| a >= PROMOTE_AGREEMENT).unwrap_or(true);
-        if let Some(s) = scheduled {
+        if scheduled.is_some() {
             self.last_review.insert(c.id.clone(), day);
-            let _ = s;
         }
         let to = if bad && cur > Rung::Inform {
             Rung::from_level(cur.level() - 1)

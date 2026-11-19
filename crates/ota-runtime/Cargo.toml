@@ -1,4 +1,18 @@
 [package]
 name = "ota-runtime"
+description = "Daily tick scheduler, message bus and World trait for the OTA engine"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
+
+[dependencies]
+ota-core.workspace = true
+ota-spec.workspace = true
+ota-llm.workspace = true
+ota-decide.workspace = true
+ota-tools.workspace = true
+ota-store.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+chrono.workspace = true

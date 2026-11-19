@@ -1,5 +1,18 @@
 [package]
 name = "ota-example-tiny"
+description = "Tiny Games Oy: a two-module example company on the OTA engine"
 version.workspace = true
 edition.workspace = true
 publish = false
+
+[dependencies]
+ota-core.workspace = true
+ota-spec.workspace = true
+ota-llm.workspace = true
+ota-tools.workspace = true
+ota-runtime.workspace = true
+
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+tokio.workspace = true

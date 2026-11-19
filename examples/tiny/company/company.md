@@ -4,7 +4,7 @@ name: Tiny Games Oy
 start_date: 2026-01-05
 timezone: Europe/Helsinki
 currency: EUR
-premortem_threshold: 400
+premortem_threshold: 150
 alert_budget: 3
 learning_curve_kpis: [cpi]
 pilot_limbo_n: 3
