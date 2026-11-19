@@ -75,6 +75,10 @@ impl Engine {
             if !cadence_fires(m.cadence, td) || m.classes.is_empty() {
                 continue;
             }
+            // layered rollout: a toolkit module does not think before its tool is switched on
+            if m.tool.as_deref().map(|t| !self.enabled(t, td.day)).unwrap_or(false) {
+                continue;
+            }
             let run = self.think_module(&m, td);
             if !run.think.rationale.is_empty() {
                 rationales.push(run.think.rationale.clone());
