@@ -2,7 +2,8 @@
 
 A company built on the OTA engine is a directory of human-readable files. `ota-spec`
 loads it with `ota_spec::load_company(dir)`. The reference example is
-`examples/tiny/company/`.
+`examples/tiny/company/`. Validate a company with
+`cargo run -p ota-spec --bin ota-check -- <company_dir>`.
 
 ```
 <company>/
@@ -327,8 +328,8 @@ expertise: [ua, brand]
 llm_tier: human                # tier in llm.toml used for this stand-in
 weekly_capacity_min: 900       # daily capacity = weekly / 5
 shadow_group: false            # default true for end_node
-bias:                          # also accepted as top-level keys
-  overconfidence: 0.2
+bias:                          # also accepted as top-level keys; extra keys are
+  overconfidence: 0.2          #   kept and passed to the stand-in verbatim
   challenge_acceptance: 0.7
   review_diligence: 0.8
 gate_rules:                    # validators: the Domain Expert Gate classification

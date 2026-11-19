@@ -245,14 +245,14 @@ impl Engine {
         let rh = self.st.history.sum(from, day, |a| a.real_human_actions) + td.agg.real_human_actions;
         m.real_human_share = (ha > 0).then(|| rh as f64 / ha as f64);
         m.external_signal_share = td.agg.external_share;
-        m.human_minutes = td.rec.human_actions.iter().map(|h| h.minutes_spent).sum();
+        m.human_minutes = td.rec.human_actions.iter().map(|h| h.minutes_spent).sum::<f64>() + 0.0;
         m.alerts_routed = td.agg.alerts_routed;
         m.alerts_suppressed = td.agg.alerts_suppressed;
         m.premortems_run = td.agg.premortems_run;
         m.premortems_skipped = td.agg.premortems_skipped;
         m.ledger_completeness = self.st.ledger.completeness(from, day);
         m.brier_30d = self.st.calibration.brier_window(from, day, Some(false));
-        m.llm_cost_usd = td.rec.llm_calls.iter().map(|c| c.cost_usd).sum();
+        m.llm_cost_usd = td.rec.llm_calls.iter().map(|c| c.cost_usd).sum::<f64>() + 0.0;
         m.bad_news_raised = td.rec.assumption_updates.iter().filter(|u| u.status == AssumptionStatus::Refuted).count()
             + td.rec.decision_updates.iter().filter(|d| d.outcome.as_ref().map(|o| o.success == Some(false) && o.sealed_day == day).unwrap_or(false)).count()
             + td.rec.anomalies.len();

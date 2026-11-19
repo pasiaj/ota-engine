@@ -117,6 +117,9 @@ pub struct Bias {
     pub overconfidence: f64,
     pub challenge_acceptance: f64,
     pub review_diligence: f64,
+    /// Any further bias keys the company defines (passed to stand-ins verbatim).
+    #[serde(flatten)]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

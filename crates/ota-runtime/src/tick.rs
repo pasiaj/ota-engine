@@ -324,7 +324,7 @@ impl Engine {
                 let tier = if d.z.abs() >= 6.0 { ScenarioTier::Urgent } else if d.detector == "anomaly_cluster" { ScenarioTier::Major } else { ScenarioTier::Minor };
                 let dir = if d.z >= 0.0 { "up" } else { "down" };
                 let node = ScenarioNode {
-                    id: format!("S-{}", self.st.rt.ids.next("SC")), parent: vec![], title: format!("Regime shift: {} {dir} ({:+.1}σ)", d.metric, d.z),
+                    id: self.st.rt.ids.next("SC"), parent: vec![], title: format!("Regime shift: {} {dir} ({:+.1}σ)", d.metric, d.z),
                     p: 0.2, leading_indicators: if d.detector == "z" { vec![IndicatorRule { expr: format!("abs(z({})) > 2", d.metric), effect: "confirm".into() }] } else { vec![] },
                     assumptions: vec![], tier, status: String::new(), approved_by: None, proposed_by: Some("scenario-tree".into()), created: day, history: vec![],
                 };
@@ -449,7 +449,9 @@ impl Engine {
             };
             let outcome = outcome.or_else(|| (f.resolves_on + 14 < day).then_some(false));
             if let Some(o) = outcome {
-                td.rec.forecasts_resolved.push(self.st.calibration.resolve(idx, o));
+                let r = self.st.calibration.resolve(idx, o);
+                // human forecasts are private (§13.5): never written to day files
+                if !r.human { td.rec.forecasts_resolved.push(r); }
             }
         }
     }

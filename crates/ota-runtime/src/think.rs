@@ -339,7 +339,12 @@ impl Engine {
         }
         let first_signal_day = info.iter().filter_map(|i| self.st.history.devs.iter().find(|t| &t.id == i).map(|t| t.day)).min();
         let rung = if self.enabled("autonomy", day) { self.st.autonomy.rung(&c.id) } else { c.default_rung };
-        let alternatives = c.rows.iter().enumerate().filter(|(i, _)| hit.map(|h| h.row != *i).unwrap_or(true)).map(|(_, r)| r.then.clone()).collect();
+        let mut alternatives: Vec<String> = vec![];
+        for (i, r) in c.rows.iter().enumerate() {
+            if hit.map(|h| h.row != i).unwrap_or(true) && !alternatives.contains(&r.then) && r.then != describe_action(&action) {
+                alternatives.push(r.then.clone());
+            }
+        }
         Decision {
             id: self.st.rt.ids.next("D"),
             class: c.id.clone(),

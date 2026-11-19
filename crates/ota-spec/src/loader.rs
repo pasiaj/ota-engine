@@ -496,6 +496,13 @@ fn load_people(root: &Path, cx: &mut Ctx) -> Vec<PersonSpec> {
             overconfidence: bias_src.f(&["overconfidence"]).unwrap_or(0.1),
             challenge_acceptance: bias_src.f(&["challenge_acceptance"]).unwrap_or(0.6),
             review_diligence: bias_src.f(&["review_diligence"]).unwrap_or(0.7),
+            extra: match fm.raw(&["bias", "bias_profile"]) {
+                Some(Y::Mapping(m)) => m.iter().filter_map(|(k, v)| {
+                    let k = md::norm_key(k.as_str()?);
+                    (!matches!(k.as_str(), "overconfidence" | "challenge_acceptance" | "review_diligence")).then(|| (k, yaml_to_json(v)))
+                }).collect(),
+                _ => BTreeMap::new(),
+            },
         };
         let mut gate_rules = vec![];
         if let Some(Y::Sequence(rules)) = fm.raw(&["gate_rules", "gate"]) {
