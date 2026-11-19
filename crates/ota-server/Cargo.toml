@@ -1,4 +1,23 @@
 [package]
 name = "ota-server"
+description = "HTTP API, run control and autopilot for the OTA engine"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
+
+[dependencies]
+ota-core.workspace = true
+ota-spec.workspace = true
+ota-llm.workspace = true
+ota-tools.workspace = true
+ota-runtime.workspace = true
+ota-store.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+chrono.workspace = true
+chrono-tz.workspace = true
+axum.workspace = true
+tokio.workspace = true
+tower-http.workspace = true
+tracing.workspace = true

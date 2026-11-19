@@ -19,7 +19,14 @@ fn main() -> anyhow::Result<()> {
                           r.decisions.len(), r.actions.len(), r.sentinel.len(), r.metrics.llm_cost_usd);
             }))?;
         }
-        other => anyhow::bail!("unknown command `{other}` (use: run <days> [dir])"),
+        "serve" => {
+            let dir = args.get(2).cloned().unwrap_or_else(|| "data".into());
+            tracing_subscriber::fmt().with_env_filter(tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into())).init();
+            let cfg = ota_server::ServerConfig::from_env(company_dir(), dir);
+            let rt = tokio::runtime::Runtime::new()?;
+            rt.block_on(ota_server::serve(std::sync::Arc::new(|| Box::new(ToyWorld::default()) as Box<dyn ota_runtime::World>), cfg))?;
+        }
+        other => anyhow::bail!("unknown command `{other}` (use: run <days> [dir] | serve [dir])"),
     }
     Ok(())
 }
