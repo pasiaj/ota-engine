@@ -1,4 +1,12 @@
 [package]
 name = "ota-store"
+description = "Day-partitioned JSON persistence for the OTA engine"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
+
+[dependencies]
+ota-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
