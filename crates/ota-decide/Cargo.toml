@@ -1,0 +1,4 @@
+[package]
+name = "ota-decide"
+version.workspace = true
+edition.workspace = true

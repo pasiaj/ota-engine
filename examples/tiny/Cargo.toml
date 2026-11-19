@@ -1,0 +1,5 @@
+[package]
+name = "ota-example-tiny"
+version.workspace = true
+edition.workspace = true
+publish = false

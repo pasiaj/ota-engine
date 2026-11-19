@@ -1,0 +1,4 @@
+[package]
+name = "ota-server"
+version.workspace = true
+edition.workspace = true

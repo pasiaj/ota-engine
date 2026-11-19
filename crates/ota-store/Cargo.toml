@@ -1,0 +1,4 @@
+[package]
+name = "ota-store"
+version.workspace = true
+edition.workspace = true

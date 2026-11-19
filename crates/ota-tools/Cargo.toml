@@ -1,0 +1,4 @@
+[package]
+name = "ota-tools"
+version.workspace = true
+edition.workspace = true
