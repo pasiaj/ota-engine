@@ -13,6 +13,7 @@ pub const DEMOTE_BRIER: f64 = 0.30;
 pub const PROMOTE_AGREEMENT: f64 = 0.8;
 pub const DEMOTE_AGREEMENT: f64 = 0.5;
 pub const MIN_N: usize = 6;
+pub const OFF_CYCLE_COOLDOWN_DAYS: Day = 28;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Autonomy {
@@ -56,6 +57,11 @@ impl Autonomy {
     pub fn evaluate(&mut self, c: &DecisionClass, day: Day, ev: AutonomyEvidence, scheduled: Option<&str>, ids: &mut IdGen)
         -> Option<AutonomyChange> {
         if self.history.iter().any(|h| h.class == c.id && h.status == "proposed") {
+            return None;
+        }
+        // off-cycle checks react to a threshold being crossed, not to the same evidence
+        // again: no further off-cycle change within 28 days of an approved one
+        if scheduled.is_none() && self.history.iter().any(|h| h.class == c.id && h.status == "approved" && h.day + OFF_CYCLE_COOLDOWN_DAYS > day) {
             return None;
         }
         let cur = self.rung(&c.id);
