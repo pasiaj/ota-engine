@@ -1,4 +1,15 @@
 [package]
 name = "ota-llm"
+description = "LLM tiers, budget, cache and scripted provider for the OTA engine"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
+
+[dependencies]
+ota-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+sha2.workspace = true
+hex.workspace = true
+reqwest.workspace = true

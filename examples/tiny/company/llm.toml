@@ -1,0 +1,27 @@
+daily_budget_usd = 0.50
+fallback = ["large", "small"]
+
+[tiers.small]
+provider = "openai"
+model = "gpt-4.1-nano"
+base_url = "https://api.openai.com/v1"
+price_in = 0.10
+price_out = 0.40
+
+[tiers.large]
+provider = "openai"
+model = "gpt-4.1-mini"
+price_in = 0.40
+price_out = 1.60
+
+[tiers.env]
+provider = "openai"
+model = "gpt-4.1-mini"
+price_in = 0.40
+price_out = 1.60
+
+[tiers.human]
+provider = "openai"
+model = "gpt-4.1-mini"
+price_in = 0.40
+price_out = 1.60
