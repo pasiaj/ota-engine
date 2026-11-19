@@ -592,6 +592,13 @@ version = "0.1.0"
 [[package]]
 name = "ota-tools"
 version = "0.1.0"
+dependencies = [
+ "ota-core",
+ "ota-decide",
+ "ota-spec",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "percent-encoding"
