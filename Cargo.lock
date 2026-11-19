@@ -26,6 +26,11 @@ dependencies = [
 [[package]]
 name = "ota-decide"
 version = "0.1.0"
+dependencies = [
+ "ota-core",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "ota-example-tiny"
