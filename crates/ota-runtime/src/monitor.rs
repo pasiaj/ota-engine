@@ -117,8 +117,9 @@ impl Engine {
         self.st.history.push(pending_agg.clone());
 
         if self.enabled("sentinel", day) {
+            let gokill: std::collections::BTreeSet<String> = self.spec.classes.values().filter(|c| c.kind == DecisionKind::GoKill).map(|c| c.module.clone()).collect();
             let inp = SentinelInput { day, history: &self.st.history, ledger: &self.st.ledger, calibration: &self.st.calibration,
-                                      pilot_limbo_n: self.spec.company.pilot_limbo_n };
+                                      pilot_limbo_n: self.spec.company.pilot_limbo_n, gokill_modules: Some(&gokill) };
             let mut sn = std::mem::take(&mut self.st.sentinel);
             let found = sn.scan(&inp, &mut self.st.rt.ids);
             self.st.sentinel = sn;

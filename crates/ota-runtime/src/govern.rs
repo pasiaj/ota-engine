@@ -363,6 +363,9 @@ impl Engine {
                                 *td.agg.overrides.entry("challenge".into()).or_insert(0) += 1;
                             }
                         }
+                        else {
+                            td.agg.challenges_upheld += strong.len();
+                        }
                         d.approvals.push(approval);
                         if approve {
                             if verdict == HumanVerdict::Amend { d.notes.push(format!("amended by {person}: {}", amendments.clone().unwrap_or_default())); }

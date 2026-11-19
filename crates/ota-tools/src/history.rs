@@ -14,6 +14,9 @@ pub struct DayAgg {
     pub overrides: BTreeMap<String, usize>,
     pub challenges: usize,
     pub challenges_overridden: usize,
+    /// Strong challenges a human upheld (rejected the decision over them).
+    #[serde(default)]
+    pub challenges_upheld: usize,
     pub human_rejections: usize,
     pub premortem_similarity: Option<f64>,
     pub premortems_run: usize,

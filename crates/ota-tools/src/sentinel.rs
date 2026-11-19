@@ -27,6 +27,9 @@ pub struct Input<'a> {
     pub ledger: &'a Ledger,
     pub calibration: &'a Calibration,
     pub pilot_limbo_n: usize,
+    /// Modules that own a go/kill decision class. Pilot limbo is only meaningful where a
+    /// verdict can be given; `None` checks every module.
+    pub gokill_modules: Option<&'a std::collections::BTreeSet<String>>,
 }
 
 type Hit = (String, BTreeMap<String, f64>, Vec<Id>, Severity);
@@ -82,12 +85,14 @@ impl Sentinel {
                                vec![], Severity::High))
         });
         add(FindingKind::Pathogen(Pathogen::Groupthink), {
-            let ch = h.sum(r0, r1, |a| a.challenges);
+            // the rate is over challenges a human adjudicated (overridden or upheld), not over
+            // every challenge the engine wrote: most are attached to decisions no leader sees
             let ov = h.sum(r0, r1, |a| a.challenges_overridden);
+            let ch = ov + h.sum(r0, r1, |a| a.challenges_upheld);
             let sim = h.mean(r0, r1, |a| a.premortem_similarity);
             let rate = if ch > 0 { ov as f64 / ch as f64 } else { 0.0 };
             ((ch >= 4 && rate > 0.5) || sim.map(|s| s > 0.6).unwrap_or(false)).then(|| (
-                format!("leaders override {:.0}% of adversarial challenges; pre-mortem similarity {:.2}", rate * 100.0, sim.unwrap_or(0.0)),
+                format!("leaders override {:.0}% of adjudicated strong challenges ({ov}/{ch}); pre-mortem similarity {:.2}", rate * 100.0, sim.unwrap_or(0.0)),
                 stats(&[("override_rate", rate), ("challenges", ch as f64), ("premortem_similarity", sim.unwrap_or(0.0))]), vec![], Severity::Medium))
         });
         add(FindingKind::Pathogen(Pathogen::MisleadingIncentives), {
@@ -113,10 +118,11 @@ impl Sentinel {
         add(FindingKind::FailureMode(AiFailureMode::Bypass), {
             let untraced = h.sum(d.saturating_sub(13), d, |a| a.untraced_human_actions);
             let routed: Vec<&crate::history::DevTrack> = h.devs.iter().filter(|t| t.routed && t.day + 14 >= d && t.day + 2 <= d).collect();
-            let unheeded = routed.iter().filter(|t| t.acted_day.is_none()).count();
+            // an explicit, logged dismissal (§13.15) is a disposition, not an unheeded flag
+            let unheeded = routed.iter().filter(|t| t.acted_day.is_none() && t.dismissed_day.is_none()).count();
             let share = if routed.is_empty() { 0.0 } else { unheeded as f64 / routed.len() as f64 };
             (untraced > 0 || (routed.len() >= 10 && share > 0.8)).then(|| (
-                format!("{untraced} human action(s) outside the ledger; {unheeded}/{} routed flags never acted on (14 d)", routed.len()),
+                format!("{untraced} human action(s) outside the ledger; {unheeded}/{} routed flags never acted on or dismissed (14 d)", routed.len()),
                 stats(&[("untraced", untraced as f64), ("unheeded_share", share)]), vec![], Severity::Medium))
         });
         add(FindingKind::FailureMode(AiFailureMode::Abdication), {
@@ -254,6 +260,9 @@ fn action_rules(inp: &Input) -> (Option<Hit>, Option<Hit>) {
     let mut limbo = None;
     let mut bigbang = None;
     for (m, ds) in by_module {
+        if inp.gokill_modules.map(|g| !g.contains(m)).unwrap_or(false) {
+            continue;
+        }
         let last_gokill = ds.iter().filter(|x| x.kind == DecisionKind::GoKill).map(|x| x.when).max().unwrap_or(0);
         let open_tests: Vec<Id> = ds.iter().filter(|x| x.kind == DecisionKind::Test && x.when > last_gokill
             && !matches!(x.status, DecisionStatus::Rejected | DecisionStatus::Blocked | DecisionStatus::Deferred)).map(|x| x.id.clone()).collect();
